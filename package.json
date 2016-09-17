@@ -1,0 +1,41 @@
+{
+  "name": "muti-html-webpack-plugin",
+  "version": "1.0.0",
+  "description": "a webpack plugin to due html",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zengwenfu/muti-html-webpack-plugin.git"
+  },
+  "keywords": [
+    "webpack",
+    "plugin",
+    "muti",
+    "html"
+  ],
+  "dependencies": {
+    "bluebird": "^3.4.1",
+    "html-minifier": "^2.1.6",
+    "loader-utils": "^0.2.15",
+    "lodash": "^4.13.1",
+    "pretty-error": "^2.0.0",
+    "toposort": "^1.0.0"
+  },
+  "author": "zengwenfu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zengwenfu/muti-html-webpack-plugin/issues"
+  },
+  "homepage": "https://github.com/zengwenfu/muti-html-webpack-plugin#readme",
+  "devDependencies": {
+    "css-loader": "^0.25.0",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "html-loader": "^0.4.4",
+    "style-loader": "^0.13.1",
+    "url-loader": "^0.5.7",
+    "webpack": "^1.13.2"
+  }
+}
