@@ -38,6 +38,8 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
     var isCompilationCached = false;
     var compilationPromise;
 
+    self.outputPath = compiler.options.output.path;
+
     // this.options.template = this.getFullTemplatePath(this.options.template, compiler.context);
 
     // convert absolute filename into relative so that webpack can
@@ -98,6 +100,7 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
         chunks = compilation.applyPluginsWaterfall('html-webpack-plugin-alter-chunks', chunks, { plugin: self });
         // Get assets
         var assets = self.htmlWebpackPluginAssets(compilation, chunks);
+
         // If this is a hot update compilation, move on!
         // This solves a problem where an `index.html` file is generated for hot-update js files
         // It only happens in Webpack 2, where hot updates are emitted separately before the full bundle
@@ -199,19 +202,23 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
                 return self.options.showErrors ? prettyError(err, compiler.context).toHtml() : 'ERROR';
             })
             .then(function(html) {
-                // Replace the compilation result with the evaluated html code
-                for(var i=0; i<html.length; i++) {
-                    var asset = html[i];
-                    compilation.assets[asset.outputName] = {
+                var addToAssets = function(source, outputName) {
+                    compilation.assets[outputName] = {
                         source: function() {
-                            return asset.source;
+                            return source;
                         },
                         size: function() {
-                            return asset.source.length;
+                            return source.length;
                         }
                     };
                 }
-                
+                // Replace the compilation result with the evaluated html code
+                for(var i=0; i<html.length; i++) {
+                    var source = html[i].source;
+                    var outputName = html[i].outputName;
+                    addToAssets(source, outputName);
+                }
+
             })
             .then(function() {
                 // Let other plugins know that we are done:
@@ -307,16 +314,44 @@ HtmlWebpackPlugin.prototype.postProcessHtml = function(html, assets, assetTags) 
     // if (typeof html !== 'string') {
     //     return Promise.reject('Expected html to be a string but got ' + JSON.stringify(html));
     // }
-    
     return Promise.resolve()
         // Inject
         .then(function() {
-            // if (self.options.inject) {
-            //     return self.injectAssetsIntoHtml(html, assets, assetTags);
-            // } else {
-            //     return html;
-            // }
+            for(var i=0; i<html.length; i++) {
+                var source = html[i].source;
+                var outputName = html[i].outputName;
+                html[i].source = source.replace(/##(.*?)##/g, function(match,  value) {
+                    var va = value.split('.');
+                    if(va.length!==3 || va[0] !== 'entry') {
+                        return match;
+                    } else if(!!assets.chunks[va[1]]){
+                        var chunk = assets.chunks[va[1]];
+                        var entry = false;
+                        if(va[2] === 'js') {
+                            entry = chunk.entry;
+                        } else if(va[2] === 'css') {
+                            entry = chunk.css[0];
+                        }
+
+
+                        if(!entry) {
+                            return match;
+                        }
+                        
+                        outputName = outputName.indexOf('/') === 0 ? outputName.substring(1): outputName;
+                        entry = entry.indexOf('/') === 0 ? entry.substring(1) : entry;
+                        var outputResolve = path.resolve(self.outputPath, outputName, '..');
+                        var entryResolve = path.resolve(self.outputPath, entry);
+                        return path.relative(outputResolve, entryResolve);
+
+                    } else {
+                        return match;
+                    }
+                });
+
+            }
             return html;
+
         })
         // Minify
         .then(function(html) {
@@ -506,6 +541,7 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function(assets) {
             }
         };
     });
+
     // Make tags self-closing in case of xhtml
     var selfClosingTag = !!this.options.xhtml;
     // Turn css files into link tags
