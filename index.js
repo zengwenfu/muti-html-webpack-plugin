@@ -50,6 +50,7 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
     compiler.plugin('make', function(compilation, callback) {
         //读取dirs
         readDir(path.resolve(compiler.context, self.options.templatePath), self.options.templateSuffix, self.options.path).then(function(template) {
+            
             template = self.getFullTemplatePath(template);
             compilationPromise = childCompiler.compileTemplate(template, compiler.context, self.options.filename, compilation);
             return compilationPromise;
@@ -160,6 +161,7 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
             })
             // Allow plugins to change the html before assets are injected
             .then(function(html) {
+
                 var pluginArgs = { html: html, assets: assets, plugin: self, outputName: self.childCompilationOutputName };
                 return applyPluginsAsyncWaterfall('html-webpack-plugin-before-html-processing', pluginArgs)
                     .then(function() {
@@ -167,8 +169,9 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
                     });
             })
             .then(function(html) {
-                html = html[0];
+                // html = html[0];
                 // Prepare script and link tags
+                
                 var assetTags = self.generateAssetTags(assets);
                 var pluginArgs = { head: assetTags.head, body: assetTags.body, plugin: self, chunks: chunks, outputName: self.childCompilationOutputName };
                 // Allow plugins to change the assetTag definitions
@@ -180,6 +183,7 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
             })
             // Allow plugins to change the html after assets are injected
             .then(function(html) {
+                
                 var pluginArgs = { html: html, assets: assets, plugin: self, outputName: self.childCompilationOutputName };
                 return applyPluginsAsyncWaterfall('html-webpack-plugin-after-html-processing', pluginArgs)
                     .then(function() {
@@ -196,14 +200,18 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
             })
             .then(function(html) {
                 // Replace the compilation result with the evaluated html code
-                compilation.assets['index.html'] = {
-                    source: function() {
-                        return html;
-                    },
-                    size: function() {
-                        return html.length;
-                    }
-                };
+                for(var i=0; i<html.length; i++) {
+                    var asset = html[i];
+                    compilation.assets[asset.outputName] = {
+                        source: function() {
+                            return asset.source;
+                        },
+                        size: function() {
+                            return asset.source.length;
+                        }
+                    };
+                }
+                
             })
             .then(function() {
                 // Let other plugins know that we are done:
@@ -235,7 +243,8 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
 HtmlWebpackPlugin.prototype.evaluateCompilationResult = function(compilation, compiledTemplate) {
     var sources = [];
     for(var i=0; i < compiledTemplate.length; i++) {
-         var source = compiledTemplate[0].content;
+         var source = compiledTemplate[i].content;
+         var outputName = compiledTemplate[i].outputName;
         // The LibraryTemplatePlugin stores the template result in a local variable.
         // To extract the result during the evaluation this part has to be removed.
         source = source.replace('var HTML_WEBPACK_PLUGIN_RESULT =', '');
@@ -246,7 +255,10 @@ HtmlWebpackPlugin.prototype.evaluateCompilationResult = function(compilation, co
         var newSource;
         try {
             newSource = vmScript.runInContext(vmContext);
-            sources.push(newSource);
+            sources.push({
+                source: newSource,
+                outputName: outputName 
+            });
         } catch (e) {
             return Promise.reject(e);
         }
@@ -287,29 +299,31 @@ HtmlWebpackPlugin.prototype.executeTemplate = function(templateFunction, chunks,
 
 /**
  * Html post processing
- *
+ * TODO
  * Returns a promise
  */
 HtmlWebpackPlugin.prototype.postProcessHtml = function(html, assets, assetTags) {
     var self = this;
-    if (typeof html !== 'string') {
-        return Promise.reject('Expected html to be a string but got ' + JSON.stringify(html));
-    }
+    // if (typeof html !== 'string') {
+    //     return Promise.reject('Expected html to be a string but got ' + JSON.stringify(html));
+    // }
+    
     return Promise.resolve()
         // Inject
         .then(function() {
-            if (self.options.inject) {
-                return self.injectAssetsIntoHtml(html, assets, assetTags);
-            } else {
-                return html;
-            }
+            // if (self.options.inject) {
+            //     return self.injectAssetsIntoHtml(html, assets, assetTags);
+            // } else {
+            //     return html;
+            // }
+            return html;
         })
         // Minify
         .then(function(html) {
-            if (self.options.minify) {
-                var minify = require('html-minifier').minify;
-                return minify(html, self.options.minify);
-            }
+            // if (self.options.minify) {
+            //     var minify = require('html-minifier').minify;
+            //     return minify(html, self.options.minify);
+            // }
             return html;
         });
 };
