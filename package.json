@@ -1,6 +1,6 @@
 {
   "name": "muti-html-webpack-plugin",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "a webpack plugin to due html",
   "main": "index.js",
   "scripts": {
