@@ -7,7 +7,7 @@ var path = require('path');
 var childCompiler = require('./lib/compiler.js');
 var prettyError = require('./lib/errors.js');
 var chunkSorter = require('./lib/chunksorter.js');
-var readDir = require('./lib/readDir.js');
+var readDir = require('./lib/readDirAsync.js');
 Promise.promisifyAll(fs);
 
 function HtmlWebpackPlugin(options) {
@@ -37,6 +37,7 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
     var self = this;
     var isCompilationCached = false;
     var compilationPromise;
+
 
     self.outputPath = compiler.options.output.path;
 
