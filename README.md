@@ -6,5 +6,4 @@
 4. path，相对于output中配置的path，不传则相等
 
 
-##问题
-1. 如果目录views目录只有一级 readDir会出问题
+
