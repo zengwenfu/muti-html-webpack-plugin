@@ -17,6 +17,7 @@
     "html"
   ],
   "dependencies": {
+    "async": "^2.0.1",
     "bluebird": "^3.4.1",
     "html-minifier": "^2.1.6",
     "loader-utils": "^0.2.15",
