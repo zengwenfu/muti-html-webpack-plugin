@@ -29,7 +29,8 @@ function HtmlWebpackPlugin(options) {
         title: 'Webpack App',
         xhtml: false,
         templateSuffix: false,
-        path: false
+        path: false,
+        ignore: false
     }, options);
 }
 
@@ -52,7 +53,7 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
 
     compiler.plugin('make', function(compilation, callback) {
         //读取dirs
-        readDir(path.resolve(compiler.context, self.options.templatePath), self.options.templateSuffix, self.options.path).then(function(template) {
+        readDir(path.resolve(compiler.context, self.options.templatePath), self.options.templateSuffix, self.options.path, self.options.ignore).then(function(template) {
             
             template = self.getFullTemplatePath(template);
             compilationPromise = childCompiler.compileTemplate(template, compiler.context, self.options.filename, compilation);
