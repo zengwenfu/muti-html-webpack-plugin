@@ -95,6 +95,7 @@ html中引用webpack打包出来的js和css，可以使用##entry.[name].js/css#
 entry.[name].js对应于js的bundle
 如果匹配不到，那么插件不会做任何替换，页面没有拿到正确的引用，只能只求多福了，阿弥陀佛
 
+![](https://nodei.co/npm/muti-html-webpack-plugin.png)
 
 
 
