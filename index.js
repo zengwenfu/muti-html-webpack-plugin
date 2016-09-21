@@ -339,6 +339,10 @@ HtmlWebpackPlugin.prototype.postProcessHtml = function(html, assets, assetTags) 
                         if(!entry) {
                             return match;
                         }
+                        //如果是http或者https开头的，就不需要计算相对路径了
+                        if(entry.indexOf('http') === 0) {
+                            return entry;
+                        }
                         
                         outputName = outputName.indexOf('/') === 0 ? outputName.substring(1): outputName;
                         entry = entry.indexOf('/') === 0 ? entry.substring(1) : entry;
