@@ -335,20 +335,20 @@ HtmlWebpackPlugin.prototype.postProcessHtml = function(html, assets, assetTags) 
                             entry = chunk.css[0];
                         }
 
-
                         if(!entry) {
                             return match;
                         }
-                        //如果是http或者https开头的，就不需要计算相对路径了
-                        if(entry.indexOf('http') === 0) {
-                            return entry;
-                        }
+                       
+                        // 计算相对路径
+                        // if(entry.indexOf('.') === 0) {
+                        //     outputName = outputName.indexOf('/') === 0 ? outputName.substring(1): outputName;
+                        //     var outputResolve = path.resolve(self.outputPath, outputName, '..');
+                        //     var entryResolve = path.resolve(self.outputPath, entry);
+                        //     return path.relative(outputResolve, entryResolve);
+                        // } 
+
+                        return entry;
                         
-                        outputName = outputName.indexOf('/') === 0 ? outputName.substring(1): outputName;
-                        entry = entry.indexOf('/') === 0 ? entry.substring(1) : entry;
-                        var outputResolve = path.resolve(self.outputPath, outputName, '..');
-                        var entryResolve = path.resolve(self.outputPath, entry);
-                        return path.relative(outputResolve, entryResolve);
 
                     } else {
                         return match;
