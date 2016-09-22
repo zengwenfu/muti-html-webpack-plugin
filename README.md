@@ -65,6 +65,7 @@
 插件中的loaders对插件配置的的模板文件起作用，模板后缀是.html
 所以相当于对模板文件使用了'html!compile-nunjucks!html'三个解析器，导致解析失败。
 解决办法，module.loaders中的配置增加include过滤
+
 3. templateSuffix: 模板后缀，用于过滤非模板文件，不传则解析templatePath下的所有文件
 4. ignore: 过滤掉的模板文件，单个文件可以传string，多个文件传数组。场景：公共的头部模板，只是用于引用，我们是不需要解析成单独的文件的
 
